@@ -1,1 +1,7 @@
-/target
+**/target
+static
+package-lock.json
+node_modules
+ace
+**/*.wasm
+.vscode
