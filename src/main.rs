@@ -2,6 +2,8 @@ mod cli;
 use cli::{Action::*, CommandLineArgs};
 use std::io;
 use structopt::StructOpt;
+mod load_module;
+use load_module::*;
 
 fn main() {
     loop {
@@ -14,6 +16,7 @@ fn main() {
             Ok(args) => match args.action {
                 Load { path } => {
                     println!("Loading module {}", path);
+                    load_module_by_path(path);
                 }
                 Unload { module_name } => {
                     println!("Unloading module {}", module_name);

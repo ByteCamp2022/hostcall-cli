@@ -4,7 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-anyhow = "1.0.60"
-structopt = "0.3"
+anyhow = "1.0"
+wit-bindgen-rust = { git = "https://github.com/bytecodealliance/wit-bindgen" }
+wit-bindgen-wasmtime = { git = "https://github.com/bytecodealliance/wit-bindgen" }
+wasmtime = { version = "0.39.1" }
+wasmtime-wasi = { version = "0.39.1" }
+structopt = "0.3.26"
