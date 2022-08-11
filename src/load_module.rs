@@ -157,7 +157,7 @@ pub fn call_module_func(mname: &str, fname: &str, param: &serde_json::Value) -> 
 
 
 pub fn load_module_by_path(path :&String, name :&String) -> Result<()> {
-    // thread::sleep(Duration::from_millis(3000));
+    // thread::sleep(Duration::from_millis(2000));
     let res = registry_module(&path, &name);
     match res {
         Ok(_) => {
@@ -172,6 +172,7 @@ pub fn load_module_by_path(path :&String, name :&String) -> Result<()> {
 }
 
 pub fn unload_module_by_name(module_name: String) -> Result<()> {
+    // thread::sleep(Duration::from_millis(2000));
     let mut map = MODULE_FUNC.lock().unwrap();
     match map.remove(&module_name) {
         Some(_) => {

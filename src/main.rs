@@ -4,7 +4,7 @@ use std::io;
 use structopt::StructOpt;
 mod load_module;
 use load_module::*;
-// use std::thread;
+use std::thread;
 
 fn main() {
     load_module::initialize().unwrap();
@@ -18,14 +18,15 @@ fn main() {
             Ok(args) => match args.action {
                 Load { path, name } => {
                     println!("Loading module from {}", path);
-                    // thread::spawn(move || {
-                    //     load_module_by_path(&path, &name).unwrap();
-                    // });
-                    load_module_by_path(&path, &name).unwrap();
+                    thread::spawn(move || {
+                        load_module_by_path(&path, &name).unwrap();
+                    });
                 }
                 Unload { module_name } => {
                     println!("Unloading module {}", module_name);
-                    unload_module_by_name(module_name).unwrap();
+                    thread::spawn(move || {
+                        unload_module_by_name(module_name).unwrap();
+                    });
                 }
                 List => {
                     println!("Loaded modules list:");
