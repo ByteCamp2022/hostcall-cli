@@ -15,9 +15,9 @@ fn main() {
         let args = CommandLineArgs::from_iter_safe(&args);
         match args {
             Ok(args) => match args.action {
-                Load { module_name } => {
-                    println!("Loading module {}", module_name);
-                    load_module_by_name(module_name).unwrap();
+                Load { path, name } => {
+                    println!("Loading module from {}", path);
+                    load_module_by_path(&path, &name).unwrap();
                 }
                 Unload { module_name } => {
                     println!("Unloading module {}", module_name);
@@ -33,12 +33,14 @@ fn main() {
                 Call {
                     module_name,
                     function_name,
-                    args,
+                    param,
                 } => {
                     println!(
-                        "Calling function {} in module {} with args {:?}",
-                        function_name, module_name, args
+                        "Calling function {} in module {} with param {}",
+                        function_name, module_name, param
                     );
+                    let param:serde_json::Value = serde_json::from_str(&param.as_str()).unwrap();
+                    call_module_func(&module_name, &function_name, &param);
                 }
                 Exit => {
                     println!("Exiting");

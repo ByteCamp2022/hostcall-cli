@@ -12,3 +12,5 @@ wasmtime = { version = "0.39.1" }
 wasmtime-wasi = { version = "0.39.1" }
 structopt = "0.3.26"
 lazy_static = "1.4.0"
+serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
+serde = "1.0.70"

@@ -3,6 +3,7 @@ use lazy_static::*;
 use std::sync::Mutex;
 use anyhow::Result;
 use wasmtime::*;
+use serde_json::json;
 
 wit_bindgen_wasmtime::export!("imports.wit");
 wit_bindgen_wasmtime::import!("exports.wit");
@@ -11,16 +12,30 @@ use imports::*;
 use exports::*;
 
 // 供modules调用的函数
-fn f1(s: &String) -> &String {
-    println!("from f1, {}", s);
-    s
+fn f1(v: &serde_json::Value) -> serde_json::Value {
+    println!("enter host f1, message: {}", v["message"]);
+    println!("");
+    let rs = json!({
+        "message": "ok",
+      });
+    rs
 }
 
-
-fn f2(s: &String) -> &String {
-    println!("from f2, {}", s);
-    s
+fn f2(v: &serde_json::Value) -> serde_json::Value {
+    println!("enter host f2, message: {}", v["message"]);
+    println!("");
+    let rs = json!({
+        "message": "ok",
+      });
+    rs
 }
+
+fn f3(v: &serde_json::Value) -> serde_json::Value {
+    println!("f3");
+    println!("");
+    serde_json::from_str("{}").unwrap()
+}
+// -----------------------------------------
 
 #[derive(Default)]
 pub struct MyImports;
@@ -31,15 +46,14 @@ impl Imports for MyImports {
     fn proxy(&mut self, name: &str, param: &str) -> String {
         let mut map = HASHMAP.lock().unwrap();
         let param = String::from(param);
-
-        let rs = map.get(name).unwrap()(&param);
-        "sd".into()
+        let v:serde_json::Value = serde_json::from_str(&param).unwrap();
+        let rs = map.get(name).unwrap()(&v);
+        rs.to_string()
     }
-
 }
 
 lazy_static! {
-    static ref HASHMAP: Mutex<HashMap<String, fn(&String)->&String>> = {
+    static ref HASHMAP: Mutex<HashMap<String, fn(&serde_json::Value)->serde_json::Value>> = {
         let mut m = HashMap::new();
         Mutex::new(m)
     };
@@ -98,15 +112,10 @@ fn instantiate<I: Default, E: Default, T>(
     );
     let (exports, _instance) = mk_exports(&mut store, &module, &mut linker)?;
 
-    // for (key, value, _) in linker.iter(&mut store) {
-    //     println!("{} / {}", key, value);
-
-    // }
-
     Ok((exports, store))
 }
 
-fn registry(name: &str, f: fn(&String)->&String) {
+fn registry(name: &str, f: fn(&serde_json::Value)->serde_json::Value) {
     {
         let mut map = HASHMAP.lock().unwrap();
         map.insert(String::from(name), f);
@@ -126,14 +135,30 @@ fn registry_module(path: &str, name: &str) -> Result<()> {
     Ok(())
 }
 
-fn call_module_func(mname: &str, fname: &str, param: &str) -> String {
+pub fn call_module_func(mname: &str, fname: &str, param: &serde_json::Value) -> serde_json::Value {
 
     let mut map = MODULE_FUNC.lock().unwrap();
     let (e, mut s) = map.remove(mname).unwrap();
-    let rs = e.proxy(&mut s, fname, param);      
+    let rs = e.proxy(&mut s, fname, &param.to_string());      
     map.insert(String::from(mname), (e, s));
+    // rs.unwrap()
+    let v:serde_json::Value = serde_json::from_str(rs.unwrap().as_str()).unwrap();
+    v
+}
 
-    rs.unwrap()
+
+pub fn load_module_by_path(path :&String, name :&String) -> Result<()> {
+    let res = registry_module(&path, &name);
+    match res {
+        Ok(_) => {
+            println!("load module {} success, and registry as {}", path, name);
+        }
+        Err(e) => {
+            println!("load module {} failed, {}", path, e);
+        }
+    }
+    
+    Ok(())
 }
 
 pub fn load_module_by_name(module_name: String) -> Result<()> {

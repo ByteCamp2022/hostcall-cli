@@ -18,3 +18,35 @@ cargo run
 ## Add new wasm modules
 
 Just follow what was done in module_A.
+
+
+## demostrate how hot-update works
+
+load module_A.wasm A
+```
+output:
+    Loading module from module_A.wasm
+    load module module_A.wasm success, and registry as A
+```
+
+call A modulef1 {"message":"hello_from_cli"}
+```
+output:
+    Calling function modulef1 in module A with param {"message":"hello_from_cli"}
+    enter module a, message: "hello_from_cli"
+    enter host f1, message: "implemented in host"
+```
+
+load module_B.wasm A
+```
+output:
+    Loading module from module_B.wasm
+    load module module_B.wasm success, and registry as A
+```
+call A modulef1 {"message":"hello_from_cli"}
+```
+output:
+    Calling function modulef1 in module A with param {"message":"hello_from_cli"}
+    enter module b, message: "hello_from_cli"
+    enter host f1, message: "implemented in host"
+```

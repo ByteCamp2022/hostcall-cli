@@ -5,7 +5,8 @@ pub enum Action {
     /// Load a module
     Load {
         #[structopt()]
-        module_name: String,
+        path: String,
+        name: String,
     },
     /// Unload a module
     Unload {
@@ -26,7 +27,7 @@ pub enum Action {
         #[structopt()]
         function_name: String,
         #[structopt()]
-        args: Vec<String>,
+        param: String,
     },
     /// Exits the program
     Exit,
