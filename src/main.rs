@@ -32,9 +32,6 @@ fn main() {
                     println!("Loaded modules list:");
                     show_module_list().unwrap();
                 }
-                Listfn { module_name } => {
-                    println!("Listing functions in module {}", module_name);
-                }
                 Call {
                     module_name,
                     function_name,

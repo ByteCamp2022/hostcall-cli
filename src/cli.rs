@@ -15,11 +15,6 @@ pub enum Action {
     },
     /// List loaded modules
     List,
-    /// List functions in a module
-    Listfn {
-        #[structopt()]
-        module_name: String,
-    },
     /// Call a function in a module
     Call {
         #[structopt()]
