@@ -4,6 +4,7 @@ use std::io;
 use structopt::StructOpt;
 mod load_module;
 use load_module::*;
+// use std::thread;
 
 fn main() {
     load_module::initialize().unwrap();
@@ -17,6 +18,9 @@ fn main() {
             Ok(args) => match args.action {
                 Load { path, name } => {
                     println!("Loading module from {}", path);
+                    // thread::spawn(move || {
+                    //     load_module_by_path(&path, &name).unwrap();
+                    // });
                     load_module_by_path(&path, &name).unwrap();
                 }
                 Unload { module_name } => {
@@ -40,7 +44,7 @@ fn main() {
                         function_name, module_name, param
                     );
                     let param:serde_json::Value = serde_json::from_str(&param.as_str()).unwrap();
-                    call_module_func(&module_name, &function_name, &param);
+                    call_module_func(&module_name, &function_name, &param).unwrap();
                 }
                 Exit => {
                     println!("Exiting");

@@ -4,6 +4,8 @@ use std::sync::Mutex;
 use anyhow::Result;
 use wasmtime::*;
 use serde_json::json;
+// use std::thread;
+// use std::time::Duration;
 
 wit_bindgen_wasmtime::export!("imports.wit");
 wit_bindgen_wasmtime::import!("exports.wit");
@@ -135,19 +137,27 @@ fn registry_module(path: &str, name: &str) -> Result<()> {
     Ok(())
 }
 
-pub fn call_module_func(mname: &str, fname: &str, param: &serde_json::Value) -> serde_json::Value {
+pub fn call_module_func(mname: &str, fname: &str, param: &serde_json::Value) -> Result<serde_json::Value> {
 
     let mut map = MODULE_FUNC.lock().unwrap();
-    let (e, mut s) = map.remove(mname).unwrap();
+    let e: Exports<Context<MyImports, ExportsData>>;
+    let mut s: Store<Context<MyImports, ExportsData>>;
+    if let Some((exports, store)) = map.remove(mname) {
+        e = exports;
+        s = store;
+    } else {
+        println!("module or function not found");
+        return Err(anyhow::anyhow!("module or function not found"));
+    }
     let rs = e.proxy(&mut s, fname, &param.to_string());      
     map.insert(String::from(mname), (e, s));
-    // rs.unwrap()
     let v:serde_json::Value = serde_json::from_str(rs.unwrap().as_str()).unwrap();
-    v
+    Ok(v)
 }
 
 
 pub fn load_module_by_path(path :&String, name :&String) -> Result<()> {
+    // thread::sleep(Duration::from_millis(3000));
     let res = registry_module(&path, &name);
     match res {
         Ok(_) => {
@@ -155,21 +165,6 @@ pub fn load_module_by_path(path :&String, name :&String) -> Result<()> {
         }
         Err(e) => {
             println!("load module {} failed, {}", path, e);
-        }
-    }
-    
-    Ok(())
-}
-
-pub fn load_module_by_name(module_name: String) -> Result<()> {
-    let res = registry_module(&(module_name.clone() + ".wasm"), &module_name);
-    match res {
-        Ok(_) => {
-            println!("load module {} success", module_name);
-            // call_module_func(&module_name, "modulef1", "call after first load");
-        }
-        Err(e) => {
-            println!("load module {} failed, {}", module_name, e);
         }
     }
     
