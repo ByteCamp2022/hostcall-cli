@@ -1,5 +1,0 @@
-f1: func(s: string)
-f2: func() -> string
-f3: func()
-f4: func(ls: list<u8>)
-

@@ -1,0 +1,11 @@
+[package]
+    name    = "module_B"
+    version = "0.1.0"
+    edition = "2021"
+
+
+[dependencies]
+    anyhow           = "1.0"
+    wit-bindgen-rust = { git = "https://github.com/bytecodealliance/wit-bindgen" }
+
+[workspace]
