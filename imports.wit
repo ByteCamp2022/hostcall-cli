@@ -1,0 +1,1 @@
+proxy: func(name: string, param: string) -> string

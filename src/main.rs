@@ -6,6 +6,7 @@ mod load_module;
 use load_module::*;
 
 fn main() {
+    load_module::initialize().unwrap();
     loop {
         let mut line = String::new();
         io::stdin().read_line(&mut line).unwrap();
@@ -14,15 +15,17 @@ fn main() {
         let args = CommandLineArgs::from_iter_safe(&args);
         match args {
             Ok(args) => match args.action {
-                Load { path } => {
-                    println!("Loading module {}", path);
-                    load_module_by_path(path);
+                Load { module_name } => {
+                    println!("Loading module {}", module_name);
+                    load_module_by_name(module_name).unwrap();
                 }
                 Unload { module_name } => {
                     println!("Unloading module {}", module_name);
+                    unload_module_by_name(module_name).unwrap();
                 }
                 List => {
-                    println!("Listing modules");
+                    println!("Loaded modules list:");
+                    show_module_list().unwrap();
                 }
                 Listfn { module_name } => {
                     println!("Listing functions in module {}", module_name);

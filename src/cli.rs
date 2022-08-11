@@ -5,7 +5,7 @@ pub enum Action {
     /// Load a module
     Load {
         #[structopt()]
-        path: String,
+        module_name: String,
     },
     /// Unload a module
     Unload {

@@ -11,3 +11,4 @@ wit-bindgen-wasmtime = { git = "https://github.com/bytecodealliance/wit-bindgen"
 wasmtime = { version = "0.39.1" }
 wasmtime-wasi = { version = "0.39.1" }
 structopt = "0.3.26"
+lazy_static = "1.4.0"
