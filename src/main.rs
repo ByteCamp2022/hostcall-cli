@@ -83,17 +83,17 @@ fn test() {
         cli();
     }));
 
-    // children.push(thread::spawn(move || {
-    //     load_module_by_path(&String::from("module_A.wasm"), &String::from("A")).unwrap();
-    //     loop {
-    //         thread::sleep(Duration::from_millis(3000));
+    children.push(thread::spawn(move || {
+        load_module_by_path(&String::from("module_A.wasm"), &String::from("A")).unwrap();
+        loop {
+            thread::sleep(Duration::from_millis(3000));
 
-    //         let param: serde_json::Value =
-    //             serde_json::from_str("{\"message\":\"hello_from_cli\"}").unwrap();
-    //         println!("call from test thread");
-    //         call_module_func("A", "modulef1", &param);
-    //     }
-    // }));
+            let param: serde_json::Value =
+                serde_json::from_str("{\"message\":\"hello_from_cli\"}").unwrap();
+            println!("call from test thread");
+            call_module_func("A", "modulef1", &param);
+        }
+    }));
 
     for child in children {
         let _ = child.join();
