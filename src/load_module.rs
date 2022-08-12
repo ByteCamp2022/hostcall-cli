@@ -4,6 +4,8 @@ use std::sync::Mutex;
 use anyhow::Result;
 use wasmtime::*;
 use serde_json::json;
+use std::fs;
+
 // use std::thread;
 // use std::time::Duration;
 
@@ -13,7 +15,7 @@ wit_bindgen_wasmtime::import!("exports.wit");
 use imports::*;
 use exports::*;
 
-// 供modules调用的函数
+// host侧 供modules调用的函数
 fn f1(v: &serde_json::Value) -> serde_json::Value {
     println!("enter host f1, message: {}", v["message"]);
     println!("");
@@ -37,6 +39,47 @@ fn f3(v: &serde_json::Value) -> serde_json::Value {
     println!("");
     serde_json::from_str("{}").unwrap()
 }
+
+fn responseStatus(v: &serde_json::Value) -> serde_json::Value {
+    let rs = json!({
+        "status": v["status"].as_str().unwrap(),
+      });
+    rs
+}
+
+fn response_HTML(v: &serde_json::Value) -> serde_json::Value {
+    let html = fs::read_to_string(v["path"].as_str().unwrap()).unwrap();
+    // return html;
+    let rs = json!({
+        "html": html,
+      });
+    rs
+}
+
+fn response(v: &serde_json::Value) -> serde_json::Value {
+    let rs = json!({
+        "response": v["response"].as_str().unwrap(),
+      });
+    rs
+}
+
+// fn response_HTML(path: String) -> String {
+//     let html = fs::read_to_string(path).unwrap();
+//     return html;
+// }
+
+// fn response(path: String) -> String {
+//     let s = String::from(" ");
+//     let status = responseStatus(s);
+//     let contents = response_HTML(path);
+//     let resp = format!(
+//         "{}\r\nContent-Length: {}\r\n\r\n{}",
+//         status,
+//         contents.len(),
+//         contents
+//     );
+//     return resp;
+// }
 // -----------------------------------------
 
 #[derive(Default)]
@@ -196,5 +239,10 @@ pub fn show_module_list() -> Result<()> {
 pub fn initialize() -> Result<()> {
     registry("f1", f1);
     registry("f2", f2);
+
+    registry("responseStatus", responseStatus);
+    registry("response_HTML", response_HTML);
+    registry("response", response);
+    
     Ok(())
 }

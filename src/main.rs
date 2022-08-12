@@ -3,9 +3,13 @@ use cli::{Action::*, CommandLineArgs};
 use core::time;
 use std::io;
 use structopt::StructOpt;
+
 mod load_module;
 use load_module::*;
 use std::thread;
+
+mod http_server;
+
 
 fn cli() {
     loop {
@@ -29,6 +33,7 @@ fn cli() {
                 List => {
                     println!("Loaded modules list:");
                     show_module_list().unwrap();
+                    // server_test();
                 }
                 Call {
                     module_name,
@@ -73,6 +78,11 @@ fn main() {
         thread::spawn(move || {
             cli();
         }));
+
+        children.push(
+            thread::spawn(move || {
+                http_server::start();
+            }));
     
     // children.push(
     //     thread::spawn(move || {
