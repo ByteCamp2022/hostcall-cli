@@ -1,6 +1,7 @@
 use std::io::prelude::*;
 use std::net::TcpListener;
 use std::net::TcpStream;
+use std::str::from_utf8;
 use anyhow::Result;
 use serde_json::json;
 
@@ -9,7 +10,12 @@ use crate::load_module::*;
 fn streram_handle(stream: &mut TcpStream) {
     let mut buffer = [0; 1024];
     stream.read(&mut buffer).unwrap();
-   
+
+    // to check the request contents
+    // let foo: Box<[u8]> = Box::new(buffer);
+    // let bar = foo.into_vec();
+    // println!("\n\n{}\n\n", String::from_utf8(bar).unwrap());
+
     let sucess = b"GET / HTTP/1.1\r\n";
     let home = b"GET /home HTTP/1.1\r\n";
 

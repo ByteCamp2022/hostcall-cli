@@ -24,6 +24,15 @@ pub enum Action {
         #[structopt()]
         param: String,
     },
+    /// Send a request to the server
+    Request {
+        #[structopt()]
+        url: String,
+        #[structopt()]
+        port: String,
+        #[structopt()]
+        path: String,
+    },
     /// Exits the program
     Exit,
 }

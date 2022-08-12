@@ -6,6 +6,8 @@ use structopt::StructOpt;
 mod load_module;
 use load_module::*;
 use std::thread;
+use std::net::TcpStream;
+use std::io::prelude::*;
 
 mod http_server;
 
@@ -42,6 +44,27 @@ fn cli() {
                     );
                     let param: serde_json::Value = serde_json::from_str(&param.as_str()).unwrap();
                     call_module_func(&module_name, &function_name, &param);
+                }
+                Request {
+                    url, 
+                    port,
+                    path,
+                } => {
+                    println!(
+                        "\nSending request to {}:{}{}",
+                        url, port, path
+                    );
+                    let address = format!(
+                        "{}:{}",
+                        url, port
+                    );
+                    let mess = format!(
+                        "GET {} HTTP/1.1\r\n",
+                        path
+                    );
+                    let mut stream = TcpStream::connect(address).unwrap();
+                    stream.write(mess.as_bytes()).expect("request failed");
+                    println!("Sending done\n");
                 }
                 Exit => {
                     println!("Exiting");
