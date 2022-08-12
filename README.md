@@ -63,3 +63,22 @@ output:
     enter module b, message: "hello_from_cli"
     enter host f1, message: "implemented in host"
 ```
+
+with test
+```
+output:
+    call from test thread
+    module or function not found
+    load module_B.wasm A
+    Loading module from module_B.wasm
+    module or function not found
+    load module module_B.wasm success, and registry as A
+    enter module b, message: "hello_from_cli"
+    enter host f1, message: "implemented in host"
+
+    enter module b, message: "hello_from_cli"
+    enter host f1, message: "implemented in host"
+
+    enter module b, message: "hello_from_cli"
+    enter host f1, message: "implemented in host"
+```
