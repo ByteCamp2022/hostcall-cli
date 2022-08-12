@@ -23,15 +23,15 @@ fn cli() {
             Ok(args) => match args.action {
                 Load { path, name } => {
                     println!("Loading module from {}", path);
-                    load_module_by_path(&path, &name);
+                    thread::spawn(move || load_module_by_path(&path, &name));
                 }
                 Unload { module_name } => {
                     println!("Unloading module {}", module_name);
-                    unload_module_by_name(module_name);
+                    thread::spawn(move || unload_module_by_name(module_name));
                 }
                 List => {
                     println!("Loaded modules list:");
-                    show_module_list();
+                    thread::spawn(move || show_module_list());
                 }
                 Call {
                     module_name,
@@ -43,7 +43,7 @@ fn cli() {
                         function_name, module_name, param
                     );
                     let param: serde_json::Value = serde_json::from_str(&param.as_str()).unwrap();
-                    call_module_func(&module_name, &function_name, &param);
+                    thread::spawn(move || call_module_func(&module_name, &function_name, &param));
                 }
                 Request {
                     url, 
@@ -54,17 +54,19 @@ fn cli() {
                         "\nSending request to {}:{}{}",
                         url, port, path
                     );
-                    let address = format!(
-                        "{}:{}",
-                        url, port
-                    );
-                    let mess = format!(
-                        "GET {} HTTP/1.1\r\n",
-                        path
-                    );
-                    let mut stream = TcpStream::connect(address).unwrap();
-                    stream.write(mess.as_bytes()).expect("request failed");
-                    println!("Sending done\n");
+                    thread::spawn(move || {
+                        let address = format!(
+                            "{}:{}",
+                            url, port
+                        );
+                        let mess = format!(
+                            "GET {} HTTP/1.1\r\n",
+                            path
+                        );
+                        let mut stream = TcpStream::connect(address).unwrap();
+                        stream.write(mess.as_bytes()).expect("request failed");
+                        println!("Sending done\n");
+                    });
                 }
                 Exit => {
                     println!("Exiting");
